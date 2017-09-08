@@ -1,3 +1,7 @@
+# Pega o conteúdo de uma página web
+def get_page( page ): # Procedimento ainda não implementado
+
+# Retorna o primeiro link na página bem como a sua posição final
 def get_next_target( page ):
     start_link = page.find( '<a href=' )
 
@@ -9,14 +13,32 @@ def get_next_target( page ):
     url = page[start_quote+1:end_quote]
     return url, end_quote
 
-def print_all_links( page ):
+# Compara se existem elementos iguais. Se não insere o elemento em 'p'
+def union( p, q ):
+    for e in q:
+        if e not in p:
+            p.append( e )
+
+# Substitui o procedimento print_all_links (apenas imprimia os links -- teste)
+# retorna uma lista de todos os links na página
+def get_all_links( page ):
+    links = []
     while True:
-        url, endpos = get_next_target( page )
+        url,endpos = get_next_target( page )
         if url:
-            print url
+            links.append( url )
             page = page[endpos:]
         else:
             break
+    return links
 
-page = get_page( 'http://xkcd.com/353' )
-print_all_links( page )
+# retorna a lista de todos os links que foram rastreados
+def crawl_web( seed ):
+    tocrawl = [seed]
+    crawled = []
+    while tocrawl:
+        page = tocrawl.pop()
+        if page not in crawled:
+            union( tocrawl, get_all_links( get_page( page ) ) )
+            crawled.append( page )
+    return crawled
