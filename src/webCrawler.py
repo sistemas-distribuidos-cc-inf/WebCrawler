@@ -42,6 +42,7 @@ def crawl_web( seed ): # argumento opcional 'max_page'
             union( tocrawl, get_all_links( get_page( page ) ) )
             crawled.append( page )
     return crawled
+
 # Opcional que reduz a busca em profundidade. Substituir por crawl_web( seed ):
 #def crawl_web(seed,max_depth):
 #    tocrawl = [seed]
