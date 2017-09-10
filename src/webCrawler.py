@@ -1,5 +1,18 @@
+#coding: utf-8
+import urllib
+# Retorna uma string com o conteúdo da página web
+def get_page( url ):
+    try:
+        return urllib.urlopen( url ).read()
+    except:
+        return ""
+
 # Pega o conteúdo de uma página web
-def get_page( page ): # Procedimento ainda não implementado
+def get_page( page ):
+    content = urllib.urlopen( page )
+    code = content.read()
+    content.close()
+    return code
 
 # Retorna o primeiro link na página bem como a sua posição final
 def get_next_target( page ):
@@ -32,29 +45,37 @@ def get_all_links( page ):
             break
     return links
 
+# Procedimento para criar uma strutura de indices
+def add_to_index( index, keyword, url ):
+    for entry in index:
+        if entry[0] == keyword:
+            entry[1].append( url )
+            return
+    index.append( [ [keyword], [url] ] )
+
+# Procedimento que retorna a lista de links associado a palavra chave 'word'
+def lookup( index, word ):
+    for entry in index:
+        if entry[0] == word:
+            return entry[1]
+    return []
+
+# Modifica o indice
+def add_page_to_index( index, url, content ):
+    words = content.split()
+    for word in words:
+        add_to_index( index, word, url )
+
 # retorna a lista de todos os links que foram rastreados
-def crawl_web( seed ): # argumento opcional 'max_page'
+def crawl_web( seed, max_page ): # argumento opcional 'max_page'
     tocrawl = [seed]
     crawled = []
+    index   = []
     while tocrawl:
         page = tocrawl.pop()
-        if page not in crawled: #and len( crawled ) < max_page:
-            union( tocrawl, get_all_links( get_page( page ) ) )
+        if page not in crawled and len( crawled ) < max_page:
+            content = get_page( page )
+            add_page_to_index( index, page, content )
+            union( tocrawl, get_all_links( content ) )
             crawled.append( page )
-    return crawled
-
-# Opcional que reduz a busca em profundidade. Substituir por crawl_web( seed ):
-#def crawl_web(seed,max_depth):
-#    tocrawl = [seed]
-#    crawled = []
-#    next_depth = []
-#    depth = 0
-#    while tocrawl and depth <= max_depth:
-#        page = tocrawl.pop()
-#        if page not in crawled:
-#            union(next_depth, get_all_links(get_page(page)))
-#            crawled.append(page)
-#        if not tocrawl:
-#            tocrawl, next_depth = next_depth, []
-#            depth = depth + 1
-#    return crawled
+    return index
