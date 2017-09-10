@@ -7,13 +7,6 @@ def get_page( url ):
     except:
         return ""
 
-# Pega o conteúdo de uma página web
-def get_page( page ):
-    content = urllib.urlopen( page )
-    code = content.read()
-    content.close()
-    return code
-
 # Retorna o primeiro link na página bem como a sua posição final
 def get_next_target( page ):
     start_link = page.find( '<a href=' )
