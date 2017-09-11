@@ -1,5 +1,9 @@
-#coding: utf-8
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import urllib
+import sys
+
 # Retorna uma string com o conteúdo da página web
 def get_page( url ):
     try:
@@ -25,8 +29,7 @@ def union( p, q ):
         if e not in p:
             p.append( e )
 
-# Substitui o procedimento print_all_links (apenas imprimia os links -- teste)
-# retorna uma lista de todos os links na página
+# Retorna uma lista com todos os links da página passada como parametro
 def get_all_links( page ):
     links = []
     while True:
@@ -59,16 +62,40 @@ def add_page_to_index( index, url, content ):
     for word in words:
         add_to_index( index, word, url )
 
-# retorna a lista de todos os links que foram rastreados
-def crawl_web( seed, max_page ): # argumento opcional 'max_page'
+# Retorna uma lista (strutura) contendo o link da página e o conteúdo
+#def crawl_web( seed, page_max ): # argumento opcional 'max_page'
+#    tocrawl = [seed]
+#    crawled = []
+#    index   = []
+#    while tocrawl:
+#        page = tocrawl.pop()
+#        if page not in crawled and len( crawled ) < page_max:
+#            content = get_page( page )
+#            add_page_to_index( index, page, content )
+#            union( tocrawl, get_all_links( content ) )
+#            crawled.append( page )
+#    return index
+def crawl_web( seed, page_max ): # argumento opcional 'max_page'
     tocrawl = [seed]
     crawled = []
-    index   = []
     while tocrawl:
         page = tocrawl.pop()
-        if page not in crawled and len( crawled ) < max_page:
+        if page not in crawled and len( crawled ) < page_max:
             content = get_page( page )
-            add_page_to_index( index, page, content )
             union( tocrawl, get_all_links( content ) )
             crawled.append( page )
-    return index
+    return crawled
+
+# Variavel que armazena os dados coletados
+pagesCrawled =[]
+
+# Verifica os parametros de entrada
+url_seed = ''
+max_page = 0
+if len( sys.argv ) == 3:
+    url_seed = sys.argv[1]
+    max_page = sys.argv[2]
+    pagesCrawled = crawl_web( url_seed, max_page )
+    with open("Estrutura Word Links.txt", "w") as links_file: links_file.write( str( pagesCrawled ) )
+else:
+    print 'Error: Espera-se <programa> <url> <qtd max_page>\n'
